@@ -142,13 +142,6 @@
       },
       _teardown: function( options ) {
         document.getElementById( options.target ) && document.getElementById( options.target ).removeChild( options.anchor );
-        /*var cueId,
-            loadCues = options._loadCues;
-        if( loadCues && loadCues.length ) {
-          while ( cueId = loadCues.pop() ) {
-            this.removeTrackEvent( cueId );
-          }
-        }*/
       },
       loader: function( options, data ) {
         if ( !data.time || !data.src ) {

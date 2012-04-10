@@ -127,8 +127,8 @@
         // Resets the transform when changing to a new currentTime before the end event occurred.
         options.word.style[ supports.transform ] = "";
 
-        options.word.style.fontSize = ~~( 30 + 20 * Math.random() ) + "px";
-        spanLocation = spanLocation % ( options._container.offsetWidth - options.word.offsetWidth );
+        options.word.style.fontSize = "100px";
+        spanLocation = (options._container.offsetWidth/2) - (options.word.offsetWidth/2);
         options.word.style.left = spanLocation + "px";
         spanLocation += options.word.offsetWidth + 10;
         options.word.style[ supports.transform ] = "translateY(" +

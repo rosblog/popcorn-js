@@ -68,8 +68,10 @@
         }
       },
       _setup: function( options ) {
-        var img = document.createElement( "img" ),
+        var img,
             target = document.getElementById( options.target );
+
+        img = options._img = document.createElement( "img" );
 
         options.anchor = document.createElement( "a" );
         options.anchor.style.position = "relative";
@@ -117,7 +119,7 @@
           options.anchor.appendChild( img );
         }, false );
 
-        img.src = options.src;
+        img.src = options.src || "#";
       },
 
       /**
@@ -140,6 +142,26 @@
       },
       _teardown: function( options ) {
         document.getElementById( options.target ) && document.getElementById( options.target ).removeChild( options.anchor );
+        /*var cueId,
+            loadCues = options._loadCues;
+        if( loadCues && loadCues.length ) {
+          while ( cueId = loadCues.pop() ) {
+            this.removeTrackEvent( cueId );
+          }
+        }*/
+      },
+      loader: function( options, data ) {
+        if ( !data.time || !data.src ) {
+          return;
+        }
+        data._executed = false;
+        this.cue( data.time, function() {
+          if( !data._executed ) {
+            options._img.src = data.src;
+            data._executed = true;
+          }
+        });
+        return this.getLastTrackEventId();
       }
   });
 })( Popcorn );

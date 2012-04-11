@@ -120,6 +120,9 @@
         }, false );
 
         img.src = options.src || "#";
+
+        // default to true
+        options._preloadExecuted = true;
       },
 
       /**
@@ -129,6 +132,7 @@
        * options variable
        */
       start: function( event, options ) {
+        !options._preloadExecuted && options._preloadCallback();
         options.anchor.style.display = "inline";
       },
       /**
@@ -147,13 +151,14 @@
         if ( !data.time || !data.src ) {
           return;
         }
-        data._executed = false;
-        this.cue( data.time, function() {
-          if( !data._executed ) {
+        options._preloadExecuted = false;
+        options._preloadCallback = function() {
+          if( !options._preloadExecuted ) {
             options._img.src = data.src;
-            data._executed = true;
+            options._preloadExecuted = true;
           }
-        });
+        };
+        this.cue( data.time, options._preloadCallback );
         return this.getLastTrackEventId();
       }
   });

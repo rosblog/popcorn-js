@@ -41,12 +41,8 @@
       return this;
     }
 
-    trackCueHash = idHash[ trackEventId ] = [];
-
-    Popcorn.forEach( preloadData, function( data ) {
-      cueId = loader.call( that, trackEvent, data );
-      trackCueHash.push( cueId );
-    });
+    cueId = loader.call( that, trackEvent, preloadData );
+    idHash[ trackEventId ] = cueId;
 
     return this;
 
@@ -54,14 +50,10 @@
 
   // wrap removeTrackEvent so it can remove related cues for preloads
   Popcorn.removeTrackEvent = function( obj, removeId ) {
-    var cueId,
-        cueIdList;
 
     if ( removeId in idHash ) {
-      cueIdList = idHash[ removeId ];
-      while ( cueId = cueIdList.pop() ) {
-        originalRemoveTrackEvent( obj, cueId );
-      }
+      originalRemoveTrackEvent( obj, idHash[ removeId ] );
+      delete idHash[ removeId ];
     }
 
     originalRemoveTrackEvent( obj, removeId );

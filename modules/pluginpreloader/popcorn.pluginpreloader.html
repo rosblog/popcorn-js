@@ -13,22 +13,30 @@
       .play()
       .pluginPreloader( "image", {
           // seconds
-          start: 5,
+          start: 10,
           // seconds
-          end: 15,
+          end: 20,
           href: "http://www.drumbeat.org/",
           text: "DRUMBEAT",
           target: "imagediv"
         },
-        [
-          {
+        {
             src: "https://www.drumbeat.org/media//images/drumbeat-logo-splash.png",
-            time: 3
-          }
-        ]
+            time: 5
+        }
       );
+      // get image TrackEvent ID
       var id = p.data.trackEvents.byEnd[2]._id;
-      p.cue( 7, function() {
+      p.cue( 3, function() {
+        // Seek Past preload exec (5 seconds)
+        // The start method for image now has a simple check to see if the preload
+        // was executed already, and will execute it if necessary. Either way, the
+        // preload callback can only happen once.
+        this.currentTime( 8 );
+      })
+      .cue( 15, function(){
+        // trigger remove of the image event, this will also remove the related
+        // "cue" event, created using the preloader
         this.removeTrackEvent( id );
       });
     }, false);

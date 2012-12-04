@@ -37,22 +37,16 @@
         })
    *
    */
-  var newdiv,
-      i = 1;
+  var i = 1;
 
   function toggle( container, display ) {
-    if ( container.map ) {
-      container.map.div.style.display = display;
-      return;
+    if ( container ) {
+      container.style.display = display;
     }
-
-    setTimeout(function() {
-      toggle( container, display );
-    }, 10 );
   }
 
   Popcorn.plugin( "openmap", function( options ){
-    var newdiv,
+    var container,
         centerlonlat,
         projection,
         displayProjection,
@@ -64,13 +58,17 @@
 
     // create a new div within the target div
     // this is later passed on to the maps api
-    newdiv = document.createElement( "div" );
-    newdiv.id = "openmapdiv" + i;
-    newdiv.style.width = "100%";
-    newdiv.style.height = "100%";
+    container = document.createElement( "div" );
+    container.id = Popcorn.guid( "openmapdiv" );
+    container.style.width = "100%";
+    container.style.height = "100%";
+    container.style.display = "none";
     i++;
 
-    target && target.appendChild( newdiv );
+    target && target.appendChild( container );
+
+    options._container = container;
+    options._target = target;
 
     // callback function fires when the script is run
     isGeoReady = function() {
@@ -98,7 +96,7 @@
           case "SATELLITE" :
             // add NASA WorldWind / LANDSAT map
             options.map = new OpenLayers.Map({
-              div: newdiv,
+              div: container,
               maxResolution: 0.28125,
               tileSize: new OpenLayers.Size( 512, 512 )
             });
@@ -117,12 +115,12 @@
             displayProjection = new OpenLayers.Projection( "EPSG:4326" );
             projection = new OpenLayers.Projection( "EPSG:4326" );
             options.map = new OpenLayers.Map({
-              div: newdiv,
+              div: container,
               projection: projection
             });
             var relief = new OpenLayers.Layer.WMS(
               "USGS Terraserver",
-              "//terraserver-usa.org/ogcmap.ashx?",
+              "//terraserver-usa.com/ogcmap.ashx?",
               { layers: "DRG" }
             );
             options.map.addLayer( relief );
@@ -136,7 +134,7 @@
             projection = new OpenLayers.Projection( 'EPSG:900913' );
             centerlonlat = centerlonlat.transform( displayProjection, projection );
             options.map = new OpenLayers.Map( {
-              div: newdiv,
+              div: container,
               projection: projection,
               displayProjection: displayProjection,
               controls: [
@@ -153,7 +151,7 @@
             displayProjection = new OpenLayers.Projection( 'EPSG:4326' );
             centerlonlat = centerlonlat.transform( displayProjection, projection );
             options.map = new OpenLayers.Map({
-              div: newdiv,
+              div: container,
               projection: projection,
               "displayProjection": displayProjection
             });
@@ -164,7 +162,6 @@
 
         if ( options.map ) {
           options.map.setCenter(centerlonlat, options.zoom || 10);
-          options.map.div.style.display = "none";
         }
       }
     };
@@ -307,7 +304,7 @@
        * options variable
        */
       start: function( event, options ) {
-        toggle( options, "block" );
+        toggle( options._container, "block" );
       },
 
       /**
@@ -317,13 +314,16 @@
        * options variable
        */
       end: function( event, options ) {
-          toggle( options, "none" );
+          toggle( options._container, "none" );
       },
 
       _teardown: function( options ) {
+        var container = options._container,
+            target = options._target;
 
-        target && target.removeChild( newdiv );
-        newdiv = map = centerlonlat = projection = displayProjection = pointLayer = selectControl = popup = null;
+        if ( target && container && container.parentNode === target ) {
+          target.removeChild( container );
+        }
       }
     };
   },
